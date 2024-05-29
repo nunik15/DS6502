@@ -1,1 +1,63 @@
+#Q5 What is the correlation (R) between the rates of Chlamydia and Salmonellosis diseases 
+#in California?
 
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+subset_data5 <- subset(I_dis, Disease %in% c("Chlamydia", "Salmonellosis") & County == "California")
+subset_data5
+
+chlamydia_rates <- subset(subset_data5, Disease == "Chlamydia")$Rate
+salmonellosis_rates <- subset(subset_data5, Disease == "Salmonellosis")$Rate
+cor(chlamydia_rates, salmonellosis_rates)
+
+sd(chlamydia_rates)
+sd(salmonellosis_rates)
+var(chlamydia_rates)
+var(salmonellosis_rates)
+IQR(chlamydia_rates)
+IQR(salmonellosis_rates)
+mean(chlamydia_rates)
+mean(salmonellosis_rates)
+
+
+
+#Checking if there any outliers
+boxplot.stats(chlamydia_rates)
+boxplot.stats(salmonellosis_rates)
+
+#Plotting data
+plot(data = subset_data5, chlamydia_rates, salmonellosis_rates, 
+     xlab = "Chlamydia Rates", ylab = "Salmonellosis Rates", 
+     main = "Scatter Plot of Chlamydia vs Salmonellosis Rates",
+     col = "blue", pch = 16)
+
+# Adding a trend line (linear regression line)
+abline(lm(salmonellosis_rates ~ chlamydia_rates), col = "red")
+
+# Adding a legend
+legend("topleft", legend = "Trend Line", col = "red", lty = 1)
+
+
+
+#For generating ggplot
+data <- data.frame(
+  chlamydia_rates = chlamydia_rates,
+  salmonellosis_rates = salmonellosis_rates
+)
+  # Create the ggplot
+  ggplot(data, aes(x = chlamydia_rates, y = salmonellosis_rates)) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(
+    x = "Chlamydia Rates",
+    y = "Salmonellosis Rates",
+    title = "Scatter Plot of Chlamydia vs Salmonellosis Rates"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  )
