@@ -1,1 +1,20 @@
+#Q7 Statistical difference between some counties  of Cryptosporidiosis disease
+
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+subset_7 <- subset(I_dis, Disease == "Cryptosporidiosis" & County %in% c("California", "San Diego", "Lake", "San Francisco"))
+
+
+#Using Anova function to find out statistical difference between counties
+AOVmodel1<- aov(subset_7$Rate ~ subset_7$County)
+summary(AOVmodel1)
+
+#Using hoc_choc test to know which which counties are exactly different 
+TukeyHSD(AOVmodel1)
+
+boxplot(subset_7$Rate ~ subset_7$County, col = rainbow(4), main = "Statistical differnece between counties rates")
+
 
