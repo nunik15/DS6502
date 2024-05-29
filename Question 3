@@ -1,1 +1,17 @@
+#Q3 In the year of 2010, which county had at least 10 infected cases for Malaria
+
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+
+#Filtering data to have just data for 2010
+subset_2010 <- subset(I_dis, Year==2010 & Disease == "Malaria" )
+subset_2010
+
+#Identifying the County that have at least 10 infected cases of Malaria
+infect_cas <- subset(subset_2010, Count >=10)
+infect_cas
 
