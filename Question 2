@@ -1,1 +1,38 @@
+#Q2 In the year of 2005, which county had the highest rate of infected females for HIV?
 
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+#Filtering data
+subset_female <- subset(I_dis, Year==2005 & Disease == "HIV" & Sex == "Female")
+
+# Finding  the row where the maximum rate of HIV infection among females occurs
+max_female_row <- subset_female[which.max(subset_female$Rate), ]
+
+
+# Extract the county from the row
+county_female_rate <- max_female_row$County
+county_female_rate
+
+#####
+# Finding the row with the maximum population
+max_pop_row <- subset_female[which.max(subset_female$Population), ]
+max_pop_row
+
+# Extract the county from the row with the maximum population
+county_max_pop <- max_pop_row$County
+county_max_pop
+
+#Also, we can check correlation between these two variables
+cor(subset_female$Rate, subset_female$Population)
+
+
+ggplot(subset_female, aes(x = Rate, y = Population)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "blue") +
+  labs(title = "Scatter Plot of Rate of infected vs. Population",
+       x = "Population",
+       y = "Rate of infected")
