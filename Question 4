@@ -1,1 +1,54 @@
+#Q4In the period of 2010 - 2012, which county had at NO infected case for Tuberculosis?
+
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+#Filtering data for year 2010-2012 and Tuberculosis disease
+subset_tuberculosos <- subset(I_dis, Year %in% c(2010, 2011, 2012) & Disease == "Tuberculosis" & Sex == "Total")
+Counties_noCase <- subset(subset_tuberculosos, Year %in% c(2010, 2011, 2012) & Count == 0 & Sex == "Total")
+Counties_noCase
+filter(Counties_noCase)
+
+# Group by County and count the number of unique years
+Counties_noCase1 <- Counties_noCase %>%
+  group_by(County) %>%
+  filter(n_distinct(Year) == 3) 
+
+#to get unique values
+unique_counties <- unique(Counties_noCase1$County)
+unique_counties
+
+
+#############
+
+# Count the number of counties with at least 10 cases or no cases
+count10_NoCases <- sum(subset_tuberculosos$Count >= 10 | subset_tuberculosos$Count == 0)
+count10_NoCases
+
+
+# Total number of counties
+total_counties1 <- length(subset_tuberculosos$County)
+total_counties1
+
+# Calculate the ratio
+ratio <- count10_NoCases / total_counties1
+ratio
+
+
+###Association with population
+
+# Calculate correlation
+correlation <- cor(subset_tuberculosos$Count, subset_tuberculosos$Population)
+correlation 
+
+# Create scatter plot
+ggplot(subset_tuberculosos, aes(x = Population, y = Count)) +
+  geom_point() +
+  geom_smooth(method = "lm", col = "blue") +
+  labs(title = "Scatter Plot of Tuberculosis Cases vs. Population",
+       x = "Population",
+       y = "Number of Tuberculosis Cases")
 
