@@ -1,1 +1,31 @@
+##Q6 Difference between rates of Dengue disease in San Francisco and San Diego
+  
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+  
+#Cleaning data
+I_dis<- na.omit(I_dis)
 
+subset_6 <- subset(I_dis, Disease == "Dengue" & County %in% c("San Diego", "San Francisco"))
+subset_6
+
+# Extract rates for San Diego and San Francisco
+rates_sd <- subset(subset_6, County == "San Diego")$Rate
+rates_sf <- subset(subset_6, County == "San Francisco")$Rate
+
+boxplot(rates_sd)
+boxplot(rates_sf)
+
+#Checking variance of data to know are they equal for both groups or not?
+var(rates_sd)
+var(rates_sf)
+
+
+table(subset_6$Disease, subset_6$County)
+
+# Perform two-sample t-test
+t_test_result <- t.test(rates_sd, rates_sf, var.equal = FALSE)
+t_test_result
+
+boxplot.stats(rates_sd)
+boxplot.stats(rates_sf)
