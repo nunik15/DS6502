@@ -9,6 +9,14 @@ I_dis<- na.omit(I_dis)
 subset_6 <- subset(I_dis, Disease == "Dengue" & County %in% c("San Diego", "San Francisco"))
 subset_6
 
+
+#Checking if my data is normally distributed or not
+hist(subset_6$Count, probability=TRUE, main="Histogram with Normal Curve", 
+     xlab="Count", col="lightblue", breaks=10)
+curve(dnorm(x, mean=mean(subset_6$Count), sd=sd(subset_6$Count)), 
+      add=TRUE, col="darkblue", lwd=2)
+
+
 # Extract rates for San Diego and San Francisco
 rates_sd <- subset(subset_6, County == "San Diego")$Rate
 rates_sf <- subset(subset_6, County == "San Francisco")$Rate
@@ -23,9 +31,10 @@ var(rates_sf)
 
 table(subset_6$Disease, subset_6$County)
 
-# Perform two-sample t-test
-t_test_result <- t.test(rates_sd, rates_sf, var.equal = FALSE)
-t_test_result
 
 boxplot.stats(rates_sd)
 boxplot.stats(rates_sf)
+
+#  Mann-Whitney U test (non-parametric)
+test_result <-wilcox.test(rates_sd, rates_sf, exact=FALSE)
+test_result
