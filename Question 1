@@ -15,7 +15,8 @@ skim_without_charts(I_dis)
 
 
 #Q1 Which county had the upward trend of Amebiasis disease regardless of gender?
-#table(subset_disease$Disease, subset_disease$County,subset_disease$Year)
+#Filtering data
+
 subset_disease <- subset(I_dis, Disease == "Amebiasis" & Sex == "Total")
 summary(subset_disease)
 str(subset_disease) 
