@@ -1,1 +1,109 @@
-ddsdd
+#Import data into data R
+I_dis <- read.csv("Infectious Disease 2001-2014.csv")
+
+#Cleaning data
+I_dis<- na.omit(I_dis)
+
+#do some descriptive analysis to better understand the data
+head(I_dis)
+summary(I_dis)
+sapply(I_dis, summary)
+sd(I_dis$Population)
+IQR(I_dis$Population)
+var(I_dis$Population)
+skim_without_charts(I_dis)
+
+
+#Q1
+#table(subset_disease$Disease, subset_disease$County,subset_disease$Year)
+subset_disease <- subset(I_dis, Disease == "Amebiasis" & Sex == "Total")
+summary(subset_disease)
+str(subset_disease) 
+table(subset_disease$County)
+
+
+# Subset the data to include relevant columns
+subset_disease <- subset_disease %>% select(Year, County, Count)
+
+# Aggregate the data to get total counts per year for each county
+aggregated_data <- subset_disease %>% 
+  group_by(Year, County) %>% 
+  summarise(Total_Count = sum(Count))
+
+
+# Plot the trends for each county
+ggplot(aggregated_data, aes(x = Year, y = Total_Count, color = County)) +
+  geom_line() +
+  labs(title = "Trend of Amebiasis Cases in Counties Over Years",
+       x = "Year",
+       y = "Total Count of Amebiasis Cases") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+# Fit linear models to each county's data
+trend_analysis <- aggregated_data %>%
+  group_by(County) %>%
+  do(model = lm(Total_Count ~ Year, data = .))
+
+# Extract slopes from the models
+slopes <- trend_analysis %>%
+  summarize(County, Slope = coef(model)[2]) %>%
+  arrange(desc(Slope))
+
+
+# Identify the top 5 counties with the highest slopes
+highest_trend_county1 <- slopes$County[1:5]
+
+# Filter the data for the counties with the highest trends
+highest_trend_data1 <- aggregated_data %>% filter(County %in% highest_trend_county1)
+
+# Plot the trends for the top 5 counties
+ggplot(highest_trend_data1, aes(x = Year, y = Total_Count, color = County)) +
+  geom_line() +
+  labs(title = "Trend of Amebiasis Cases in Top 5 Counties Over Years",
+       x = "Year",
+       y = "Total Count of Amebiasis Cases") +
+  theme_minimal()
+
+
+###Is the trend of total infected cases is different from that of male/female infected?
+
+# Filter the data to include relevant columns for Male and Female
+subset_disease_gender <- subset(I_dis, Disease == "Amebiasis" & Sex %in% c("Female", "Male"))
+subset_disease_gender <- subset_disease_gender %>% select(Year, County, Sex, Count)
+
+# Aggregate the data to get total counts per year for each county and gender
+aggregated_data_gender <- subset_disease_gender %>% 
+  group_by(Year, County, Sex) %>% 
+  summarise(Total_Count = sum(Count))
+
+# Fit linear models to each county and gender's data
+trend_analysis_gender <- aggregated_data_gender %>%
+  group_by(County, Sex) %>%
+  do(model = lm(Total_Count ~ Year, data = .))
+
+# Extract slopes from the models
+slopes_gender <- trend_analysis_gender %>%
+  summarize(County, Sex, Slope = coef(model)[2]) %>%
+  arrange(desc(Slope))
+
+# Identify the top 5 counties with the highest slopes for each gender
+top_5_slopes_gender <- slopes_gender %>%
+  group_by(Sex) %>%
+  top_n(5, Slope)
+
+# Filter the data for the counties with the highest trends for each gender
+highest_trend_data_gender <- aggregated_data_gender %>% 
+  filter(County %in% top_5_slopes_gender$County & Sex %in% top_5_slopes_gender$Sex)
+
+# Plot the trends for the top 5 counties for each gender
+ggplot(highest_trend_data_gender, aes(x = Year, y = Total_Count, color = County)) +
+  geom_line() +
+  facet_wrap(~ Sex) +
+  labs(title = "Trend of Amebiasis Cases in Top 5 Counties Over Years by Gender",
+       x = "Year",
+       y = "Total Count of Amebiasis Cases") +
+  theme_minimal()
+
+
